@@ -30,30 +30,13 @@ class _PhotoViewScreenState extends State<PhotoViewScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
-      bottomNavigationBar: BottomNavigationBar(
-        selectedFontSize: 0,
-        unselectedFontSize: 0,
+      appBar: AppBar(
         backgroundColor: Colors.transparent,
-        currentIndex: 0,
-        selectedItemColor: Colors.white,
-        unselectedItemColor: Colors.white,
-        items: [
-          BottomNavigationBarItem(
-            label: "",
-            icon: Icon(Icons.share),
-          ),
-          BottomNavigationBarItem(
-            label: "",
-            icon: Icon(Icons.arrow_back_ios),
-          ),
-        ],
-        onTap: (currentIndex) {
-          if (currentIndex == 1) {
-            Navigator.pop(context);
-          }
-        },
+        shadowColor: Colors.transparent,
+        elevation: 0,
       ),
+      backgroundColor: Colors.black,
+      extendBodyBehindAppBar: true,
       body: Container(
         child: PhotoViewGallery.builder(
           scrollPhysics: const BouncingScrollPhysics(),

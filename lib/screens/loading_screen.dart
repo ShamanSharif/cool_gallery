@@ -1,10 +1,12 @@
 import 'dart:convert';
 
+import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cool_gallery/screens/album_screen.dart';
 import 'package:cool_gallery/services/photo_loader.dart';
 import 'package:cool_gallery/utils/database_helper.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoadingScreen extends StatefulWidget {
@@ -94,14 +96,16 @@ class _LoadingScreenState extends State<LoadingScreen> {
         print(e);
       } finally {
         if (_haveDataLoaded == false) {
-          await Future.delayed(Duration(minutes: 5), () async {
+          await Future.delayed(Duration(minutes: 10), () async {
             await _dataHaveLoaded();
             Navigator.pushNamedAndRemoveUntil(
                 context, AlbumScreen.id, (route) => false);
           });
         } else {
-          Navigator.pushNamedAndRemoveUntil(
-              context, AlbumScreen.id, (route) => false);
+          await Future.delayed(Duration(milliseconds: 1500), () {
+            Navigator.pushNamedAndRemoveUntil(
+                context, AlbumScreen.id, (route) => false);
+          });
         }
       }
     }
@@ -110,8 +114,35 @@ class _LoadingScreenState extends State<LoadingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Text("Loading"),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          SpinKitCubeGrid(
+            color: Colors.black,
+            size: 120,
+            duration: Duration(milliseconds: 1000),
+          ),
+          SizedBox(
+            height: 40,
+          ),
+          DefaultTextStyle(
+            style: const TextStyle(
+              fontSize: 24.0,
+              color: Colors.black,
+              fontWeight: FontWeight.w300,
+            ),
+            child: AnimatedTextKit(
+              animatedTexts: [
+                WavyAnimatedText("Please Wait"),
+                WavyAnimatedText("Fetching API Data"),
+                WavyAnimatedText("Caching Thumbnails"),
+                WavyAnimatedText("Caching Images"),
+              ],
+              isRepeatingAnimation: true,
+            ),
+          ),
+        ],
       ),
     );
   }

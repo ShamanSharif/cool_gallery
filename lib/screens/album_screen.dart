@@ -33,7 +33,7 @@ class _AlbumScreenState extends State<AlbumScreen> {
       Album album = Album(
         id: data["id"],
         title: data["title"],
-        subtitle: "User: " + data["userId"].toString(),
+        author: data["userId"].toString(),
       );
       albums.add(album);
     }
@@ -42,15 +42,71 @@ class _AlbumScreenState extends State<AlbumScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text("Shaman Sharif"),
+        title: Text(
+          "Shaman Sharif",
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 20,
+          ),
+        ),
+        backgroundColor: Colors.white,
+        shadowColor: Colors.white,
+        elevation: 0,
       ),
       body: SafeArea(
         child: ListView.builder(
           itemCount: albums.length,
           itemBuilder: (BuildContext context, int index) {
-            return Card(
-              child: albums[index],
+            return Container(
+              margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(50),
+                color: Colors.black.withAlpha(10),
+              ),
+              child: SizedBox(
+                height: 150,
+                child: InkWell(
+                  splashColor: Colors.black.withAlpha(80),
+                  onTap: () {
+                    Navigator.pushNamed(context, PhotoScreen.id, arguments: {
+                      "albumId": albums[index].id,
+                      "albumName": albums[index].title,
+                      "authorName": albums[index].author,
+                      "totalPhoto": albums.length,
+                    });
+                  },
+                  child: Container(
+                    padding: EdgeInsets.symmetric(vertical: 30, horizontal: 50),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          albums[index].title,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Text(
+                          "User: " + albums[index].author,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w300,
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             );
           },
         ),
@@ -61,14 +117,14 @@ class _AlbumScreenState extends State<AlbumScreen> {
 
 class Album extends StatelessWidget {
   final String title;
-  final String subtitle;
+  final String author;
   final IconData iconData;
   final int id;
 
   const Album(
       {Key key,
       @required this.title,
-      @required this.subtitle,
+      @required this.author,
       this.iconData,
       @required this.id})
       : super(key: key);
@@ -86,7 +142,7 @@ class Album extends StatelessWidget {
           fontWeight: FontWeight.bold,
         ),
       ),
-      subtitle: Text(subtitle),
+      subtitle: Text(author),
       onTap: () {
         Navigator.pushNamed(
           context,

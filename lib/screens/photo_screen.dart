@@ -48,20 +48,45 @@ class _PhotoScreenState extends State<PhotoScreen> {
   Widget build(BuildContext context) {
     final Map args = ModalRoute.of(context).settings.arguments;
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text("Shaman Sharif"),
+        iconTheme: IconThemeData(color: Colors.black),
+        title: Text(
+          "Shaman Sharif",
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 20,
+          ),
+        ),
+        backgroundColor: Colors.white,
+        shadowColor: Colors.transparent,
+        elevation: 0,
       ),
       body: SafeArea(
         child: Column(
           children: [
             Padding(
               padding: const EdgeInsets.all(25),
-              child: Text(
-                args['albumName'],
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    args['albumName'],
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text("by: User " + args["authorName"]),
+                      Text("  -  "),
+                      Text(args["totalPhoto"].toString() + " Photos"),
+                    ],
+                  ),
+                ],
               ),
             ),
             Expanded(
