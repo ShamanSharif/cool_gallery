@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cool_gallery/screens/photo_view_screen.dart';
 import 'package:cool_gallery/utils/database_helper.dart';
 import 'package:flutter/material.dart';
 
@@ -12,13 +13,6 @@ class PhotoScreen extends StatefulWidget {
 
 class _PhotoScreenState extends State<PhotoScreen> {
   var photoData;
-  List<Icon> icons = [
-    Icon(Icons.album),
-    Icon(Icons.account_circle_outlined),
-    Icon(Icons.favorite_border),
-    Icon(Icons.description),
-    Icon(Icons.clean_hands_outlined),
-  ];
 
   List<Photo> photos = [];
 
@@ -32,22 +26,19 @@ class _PhotoScreenState extends State<PhotoScreen> {
     List<Map<String, dynamic>> fetchedData =
         await DBProvider.instance.queryAll(DBProvider.photoTableName);
     photoData = jsonDecode(fetchedData[0][DBProvider.colName]);
-    await _updatePhotos(photoData);
+    await _updatePhotos(context, photoData);
     setState(() {});
   }
 
-  Future<void> _updatePhotos(dynamic photoData) async {
+  Future<void> _updatePhotos(BuildContext context, dynamic photoData) async {
     for (var data in photoData) {
       Photo photo = Photo(
+        context,
         albumId: data["albumId"],
         id: data["id"],
         name: data["title"],
-        thumbnail: CachedNetworkImage(
-          imageUrl: data["thumbnailUrl"],
-        ),
-        image: CachedNetworkImage(
-          imageUrl: data["url"],
-        ),
+        thumbnail: data["thumbnailUrl"],
+        image: data["url"],
       );
       photos.add(photo);
     }
@@ -79,7 +70,7 @@ class _PhotoScreenState extends State<PhotoScreen> {
                 crossAxisCount: 3,
                 mainAxisSpacing: 10,
                 crossAxisSpacing: 10,
-                children: photos,
+                children: _getClickableThumbnail(args["albumId"]),
               ),
             ),
           ],
@@ -87,26 +78,72 @@ class _PhotoScreenState extends State<PhotoScreen> {
       ),
     );
   }
+
+  List<Widget> _getClickableThumbnail(int albumId) {
+    List<Widget> allPhotos = [];
+    List<PhotoIndexed> albumPhotos = [];
+    int index = 0;
+    for (var photo in photos) {
+      if (photo.albumId == albumId) {
+        albumPhotos.add(
+          PhotoIndexed(
+            index,
+            photo,
+          ),
+        );
+        index++;
+      }
+    }
+    for (var albumPhoto in albumPhotos) {
+      allPhotos.add(
+        GestureDetector(
+          onTap: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => PhotoViewScreen(
+                        images: albumPhotos, currentIndex: albumPhoto.index)));
+          },
+          child: albumPhoto.photo.getImage(),
+        ),
+      );
+    }
+    return allPhotos;
+  }
 }
 
-class Photo extends StatelessWidget {
+class PhotoIndexed {
+  final int index;
+  final Photo photo;
+
+  PhotoIndexed(this.index, this.photo);
+}
+
+class Photo {
   final int albumId;
   final int id;
   final String name;
-  final CachedNetworkImage thumbnail;
-  final CachedNetworkImage image;
+  final String thumbnail;
+  final String image;
+  final BuildContext context;
 
-  const Photo({
+  const Photo(
+    this.context, {
     Key key,
     @required this.albumId,
     @required this.id,
     @required this.name,
     @required this.thumbnail,
     @required this.image,
-  }) : super(key: key);
+  });
 
-  @override
-  Widget build(BuildContext context) {
-    return thumbnail;
+  Widget getImage() {
+    return Container(
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          image: CachedNetworkImageProvider(thumbnail),
+        ),
+      ),
+    );
   }
 }
